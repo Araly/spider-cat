@@ -21,10 +21,12 @@
 #endif
 
 #define PORT 8888
-#define BUFFER_SIZE 1000;
+#define BUFFER_SIZE 1000
 
 int server();
+void server_chat(int sock);
 int client(char pseudo[]);
+void client_chat(int sock);
 
 int main(int argc, char *argv[]) {
   switch(argc) {
@@ -37,6 +39,8 @@ int main(int argc, char *argv[]) {
   }
   return 0;
 }
+
+// SERVER
 
 int server() {
   int sock, ret_sock;
@@ -71,10 +75,39 @@ int server() {
     exit(0);
   }
   puts("accept successful");
+
+  server_chat(sock);
+
   close(sock);
 
   return 0;
 }
+
+void server_chat(int sock) {
+  char buffer[BUFFER_SIZE];
+  int n;
+
+  for (;;) {
+    bzero(buffer, BUFFER_SIZE);
+
+    read(sock, buffer, sizeof(buffer));
+    printf("%s\n", buffer);
+    bzero(buffer, BUFFER_SIZE);
+    n = 0;
+
+    while ((buffer[n++] = getchar()) != '\n') {
+      ;
+    }
+    write(sock, buffer, sizeof(buffer));
+
+    if (strncmp("exit", buffer, 4) == 0) {
+      printf("exit\n");
+      break;
+    }
+  }
+}
+
+// CLIENT
 
 int client(char pseudo[]) {
   printf("welcome %s\n", pseudo);
@@ -101,7 +134,33 @@ int client(char pseudo[]) {
 
   printf("connected to the server\n");
 
+  client_chat(sock);
+
   close(sock);
 
   return 0;
+}
+
+void client_chat(int sock) {
+  char buffer[BUFFER_SIZE];
+  int n;
+  for (;;) {
+    bzero(buffer, sizeof(buffer));
+    printf("> ");
+    n = 0;
+    while ((buffer[n++] = getchar()) != '\n') {
+      ;
+    }
+    printf("%s\n", buffer);
+    write(sock, buffer, sizeof(buffer));
+    printf("%s\n", buffer);
+    bzero(buffer, sizeof(buffer));
+    printf("%s\n", buffer);
+    read(sock, buffer, sizeof(buffer));
+    printf("%s\n", buffer);
+    if ((strncmp(buffer, "exit", 4)) == 0) {
+      printf("exit\n");
+      break;
+    }
+  }
 }
