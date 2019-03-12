@@ -8,10 +8,11 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 int server();
 int client(char *username);
-int server_chat(int sock);
+void *server_chat(void *vargp);
 int client_chat(int sock, char *username);
 
 #endif

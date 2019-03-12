@@ -2,7 +2,6 @@
 #define PORT 8080
 
 int client(char *username) {
-  printf("welcome back %s\n", username);
 	int sock = 0;
 	struct sockaddr_in serv_addr;
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -33,6 +32,12 @@ int client(char *username) {
 
 int client_chat(int sock, char *username) {
   char message[2050], tmp_message[2000];
+  send(sock, username, strlen(username), 0);
+  read(sock, message, 2050);
+  if (strcmp(message, "success") != 0) {
+    perror("registration failed");
+    exit(EXIT_FAILURE);
+  }
   for (;;) {
     printf("> ");
     memset(message, 0, strlen(message));
