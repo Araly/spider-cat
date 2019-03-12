@@ -1,12 +1,10 @@
 #include "main.h"
 #define PORT 8080
 
-int client() {
-	struct sockaddr_in address;
-	int sock = 0, valread;
+int client(char *username) {
+  printf("welcome back %s\n", username);
+	int sock = 0;
 	struct sockaddr_in serv_addr;
-	char *hello = "Hello from client";
-	char buffer[1024] = {0};
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		printf("\n Socket creation error \n");
 		return -1;
@@ -27,9 +25,31 @@ int client() {
 		printf("\nConnection Failed \n");
 		return -1;
 	}
-	send(sock , hello , strlen(hello) , 0 );
-	printf("Hello message sent\n");
-	valread = read( sock , buffer, 1024);
-	printf("%s\n",buffer );
+
+  client_chat(sock, username);
+
 	return 0;
+}
+
+int client_chat(int sock, char *username) {
+  char message[2050], tmp_message[2000];
+  for (;;) {
+    printf("> ");
+    memset(message, 0, strlen(message));
+    memset(tmp_message, 0, strlen(tmp_message));
+    fgets(tmp_message, 2000, stdin);
+    if (tmp_message[0] == '/') {
+      if (strcmp(tmp_message, "/exit\n") == 0) {
+        printf("bye\n");
+        return 0;
+      }
+    }
+    else if (tmp_message[0] != '\n') {
+      strcpy(message, username);
+      strcat(message, ": ");
+      strcat(message, tmp_message);
+      send(sock, message, strlen(message), 0);
+    }
+  }
+  return 0;
 }

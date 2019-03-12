@@ -2,12 +2,10 @@
 #define PORT 8080
 
 int server() {
-	int server_fd, new_socket, valread;
+	int server_fd, new_socket;
 	struct sockaddr_in address;
 	int opt = 1;
 	int addrlen = sizeof(address);
-	char buffer[1024] = {0};
-	char *hello = "Hello from server";
 
 	// Creating socket file descriptor
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -40,9 +38,18 @@ int server() {
 		perror("accept");
 		exit(EXIT_FAILURE);
 	}
-	valread = read( new_socket , buffer, 1024);
-	printf("%s\n",buffer );
-	send(new_socket , hello , strlen(hello) , 0 );
-	printf("Hello message sent\n");
+
+  server_chat(new_socket);
+
 	return 0;
+}
+
+int server_chat(int sock) {
+  char message[2048];
+  for (;;) {
+    memset(message, 0, strlen(message));
+    read(sock, message, 2048);
+    printf("%s", message);
+  }
+  return 0;
 }

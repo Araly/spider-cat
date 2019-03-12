@@ -10,6 +10,8 @@
 #include <arpa/inet.h>
 
 int server();
-int client();
+int client(char *username);
+int server_chat(int sock);
+int client_chat(int sock, char *username);
 
 #endif

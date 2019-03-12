@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
     server();
   }
   if (argc == 2) {
-    client();
+    client(argv[1]);
   }
 }
 
