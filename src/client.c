@@ -32,7 +32,8 @@ int client(char *username) {
 
 int client_chat(int sock, char *username) {
   char message[2050], tmp_message[2000];
-  send(sock, username, strlen(username), 0);
+  strcpy(message, username);
+  send(sock, message, strlen(message), 0);
   read(sock, message, 2050);
   if (strcmp(message, "success") != 0) {
     perror("registration failed");

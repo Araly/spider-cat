@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "main.h"
 #define PORT 8080
 #define MAX_USERS 10
@@ -42,33 +43,50 @@ int server() {
 		perror("listen");
 		exit(EXIT_FAILURE);
   }
-  char buffer[256];
+  char message[1024];
   pthread_t threads[MAX_USERS];
   while (users_no < MAX_USERS) {
+    users[users_no].sockfd = (int)0;
     users[users_no].client_addrlen = sizeof(users[users_no].client_addr);
-    if ((users[users_no].sockfd = accept(server_fd, (struct sockaddr *)&address,
+    int s;
+    if ((s = accept(server_fd, (struct sockaddr *)&address,
                              (socklen_t*)&addrlen)) < 0) {
       perror("accept");
       exit(EXIT_FAILURE);
     }
-    printf("waiting for user registration...\n");
-    bzero(buffer, 256);
+    sleep(1);
+    users[users_no].sockfd = s;
+    memset(message, 0, strlen(message));
 
-    if ((read(users[users_no].sockfd, buffer, 255)) < 0) {
+    if ((read(users[users_no].sockfd, message, 255)) < 0) {
       perror("registration");
       exit(EXIT_FAILURE);
     }
-    printf("registration success");
-    strcpy(users[users_no].username, buffer);
-    printf("user %s registrated", buffer);
-    strcpy(buffer, "success");
-    if ((send(users[users_no].sockfd, buffer, strlen(buffer), 0)) < 0) {
+    printf("registration success\n");
+    sleep(1);
+    strcpy(users[users_no].username, message);
+    sleep(1);
+    printf("hum\n");
+    printf("hum\n");
+    printf("hum\n");
+    printf("hum\n");
+    printf("user %s registrated\n", users[users_no].username);
+    printf("user\n");
+    printf("user\n");
+    printf("user\n");
+    printf("success\n");
+    for (int i = 0; i < 10; i++) {
+      printf("%d\n", i);
+    }
+    if ((send(users[users_no].sockfd, message, strlen(message), 0)) < 0) {
       perror("send");
       exit(EXIT_FAILURE);
     }
 
     pthread_create(&threads[users_no], NULL, server_chat, &users_no);
     users_no++;
+    sleep(1);
+    printf("done");
   }
 
 	return 0;
