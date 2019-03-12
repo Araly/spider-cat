@@ -1,4 +1,3 @@
-#include <unistd.h>
 #include "main.h"
 #define PORT 8080
 #define MAX_USERS 10
@@ -11,13 +10,27 @@ struct user {
   int client_addrlen;
   struct sockaddr_in client_addr;
   int sockfd;
-  char username[16];
+  char author[16];
 };
 struct user users[MAX_USERS], tmp_user;
 int users_no = 0;
 
+void *server_chat(void *arg) {
+  int user_no = (int)arg;
+  char message[2050];
+  for (;;) {
+    memset(message, 0, strlen(message));
+    read(users[user_no].sockfd, message, 2050);
+    printf("%s: %s", users[user_no].author, message);
+  }
+  pthread_exit(NULL);
+}
+
 int server() {
-	// Creating socket file descriptor
+  pthread_t threads[MAX_USERS];
+
+  pthread_create(&threads[0], NULL, server_chat, NULL);
+  // Creating socket file descriptor
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
 		perror("socket failed");
 		exit(EXIT_FAILURE);
@@ -44,7 +57,6 @@ int server() {
 		exit(EXIT_FAILURE);
   }
   char message[1024];
-  pthread_t threads[MAX_USERS];
   while (users_no < MAX_USERS) {
     users[users_no].sockfd = (int)0;
     users[users_no].client_addrlen = sizeof(users[users_no].client_addr);
@@ -54,7 +66,6 @@ int server() {
       perror("accept");
       exit(EXIT_FAILURE);
     }
-    sleep(1);
     users[users_no].sockfd = s;
     memset(message, 0, strlen(message));
 
@@ -62,42 +73,18 @@ int server() {
       perror("registration");
       exit(EXIT_FAILURE);
     }
-    printf("registration success\n");
-    sleep(1);
-    strcpy(users[users_no].username, message);
-    sleep(1);
-    printf("hum\n");
-    printf("hum\n");
-    printf("hum\n");
-    printf("hum\n");
-    printf("user %s registrated\n", users[users_no].username);
-    printf("user\n");
-    printf("user\n");
-    printf("user\n");
-    printf("success\n");
-    for (int i = 0; i < 10; i++) {
-      printf("%d\n", i);
-    }
+    strcpy(users[users_no].author, message);
+    printf("%s joined the channel\n", users[users_no].author);
     if ((send(users[users_no].sockfd, message, strlen(message), 0)) < 0) {
-      perror("send");
+      perror("response");
       exit(EXIT_FAILURE);
     }
-
-    pthread_create(&threads[users_no], NULL, server_chat, &users_no);
+    if (pthread_create(&threads[users_no], NULL, server_chat, (void *)users_no)) {
+      perror("pthread_create");
+      exit(EXIT_FAILURE);
+    }
     users_no++;
-    sleep(1);
-    printf("done");
   }
-
-	return 0;
+  pthread_exit(NULL);
 }
 
-void *server_chat(void *vargp) {
-  char message[2048];
-  for (;;) {
-    memset(message, 0, strlen(message));
-    read(users[(int)vargp].sockfd, message, 2048);
-    printf("%s", message);
-  }
-  return NULL;
-}

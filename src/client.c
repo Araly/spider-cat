@@ -34,11 +34,13 @@ int client_chat(int sock, char *username) {
   char message[2050], tmp_message[2000];
   strcpy(message, username);
   send(sock, message, strlen(message), 0);
+  memset(message, 0, strlen(message));
   read(sock, message, 2050);
-  if (strcmp(message, "success") != 0) {
-    perror("registration failed");
+  if (strcmp(message, username) != 0) {
+    printf("registration failed: %s\n", message);
     exit(EXIT_FAILURE);
   }
+  printf("registration success\n");
   for (;;) {
     printf("> ");
     memset(message, 0, strlen(message));
@@ -51,8 +53,6 @@ int client_chat(int sock, char *username) {
       }
     }
     else if (tmp_message[0] != '\n') {
-      strcpy(message, username);
-      strcat(message, ": ");
       strcat(message, tmp_message);
       send(sock, message, strlen(message), 0);
     }

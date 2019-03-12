@@ -12,7 +12,7 @@
 
 int server();
 int client(char *username);
-void *server_chat(void *vargp);
+void *server_chat(void *user_no_arg);
 int client_chat(int sock, char *username);
 
 #endif
