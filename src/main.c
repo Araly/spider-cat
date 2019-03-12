@@ -79,6 +79,7 @@ int server() {
   server_chat(sock);
 
   close(sock);
+  printf("socket closed");
 
   return 0;
 }
@@ -88,6 +89,7 @@ void server_chat(int sock) {
   int n;
 
   for (;;) {
+    printf("start on %d", sock);
     bzero(buffer, BUFFER_SIZE);
 
     read(sock, buffer, sizeof(buffer));
@@ -104,6 +106,7 @@ void server_chat(int sock) {
       printf("exit\n");
       break;
     }
+    printf("end");
   }
 }
 
