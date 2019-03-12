@@ -1,14 +1,28 @@
 CC = gcc
-FILES = src/*.c
-OUT_EXE = bin/spider-cat
+CFLAGS = -g -Wall
+SOURCES = src/main.c src/server.c src/client.c
+HEADERS = src/*.h
+OBJECTS = $(SOURCES:.c=.o)
+TARGET = bin/spider-cat
 
-build: $(FILES)
-	$(CC) -o $(OUT_EXE) $(FILES)
+default: build
 
-run:
-	./$(OUT_EXE)
+build: $(TARGET)
+	@echo $(TARGET) compiled
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<  -o $@
 
 clean:
-	rm -f *.o core
+	$(RM) $(OBJECTS) *~ $(TARGET)
 
 rebuild: clean build
+
+runserver:
+	$(TARGET)
+
+runclient:
+	$(TARGET) username
