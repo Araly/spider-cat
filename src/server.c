@@ -21,7 +21,16 @@ void *server_chat(void *arg) {
   for (;;) {
     memset(message, 0, strlen(message));
     read(users[user_no].sockfd, message, 2050);
-    printf("%s: %s", users[user_no].author, message);
+    if (strcmp(message, "") == 0) {
+      printf("%s left\n", users[user_no].author);
+      break;
+    }
+    char reply[2100];
+    snprintf(reply, sizeof(reply), "%c[1;33m%s:%c[0;00m %s", 27, users[user_no].author, 27, message);
+    printf("%s", reply);
+    for (int i = 0; i < users_no; i++) {
+      send(users[i].sockfd, reply, strlen(reply), 0);
+    }
   }
   pthread_exit(NULL);
 }
@@ -74,7 +83,6 @@ int server() {
       exit(EXIT_FAILURE);
     }
     strcpy(users[users_no].author, message);
-    printf("%s joined the channel\n", users[users_no].author);
     if ((send(users[users_no].sockfd, message, strlen(message), 0)) < 0) {
       perror("response");
       exit(EXIT_FAILURE);
@@ -83,7 +91,13 @@ int server() {
       perror("pthread_create");
       exit(EXIT_FAILURE);
     }
+    char reply [2100];
+    snprintf(reply, sizeof(reply), "%s joined the server\n", users[users_no].author);
+    printf("%s", reply);
     users_no++;
+    for (int i = 0; i < users_no; i++) {
+      send(users[i].sockfd, reply, strlen(reply), 0);
+    }
   }
   pthread_exit(NULL);
 }

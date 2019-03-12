@@ -30,6 +30,17 @@ int client(char *username) {
 	return 0;
 }
 
+void *reading_from_server(void *arg) {
+  int sock = (int)arg;
+  char message[2050];
+  for (;;) {
+    memset(message, 0, strlen(message));
+    read(sock, message, 2050);
+    printf("%s", message);
+  }
+  pthread_exit(NULL);
+}
+
 int client_chat(int sock, char *username) {
   char message[2050], tmp_message[2000];
   strcpy(message, username);
@@ -40,9 +51,9 @@ int client_chat(int sock, char *username) {
     printf("registration failed: %s\n", message);
     exit(EXIT_FAILURE);
   }
-  printf("registration success\n");
+  pthread_t thread;
+  pthread_create(&thread, NULL, reading_from_server, (void *)sock);
   for (;;) {
-    printf("> ");
     memset(message, 0, strlen(message));
     memset(tmp_message, 0, strlen(tmp_message));
     fgets(tmp_message, 2000, stdin);
