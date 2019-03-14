@@ -56,12 +56,11 @@ int client_chat(int sock, char *username) {
   for (;;) {
     memset(message, 0, strlen(message));
     memset(tmp_message, 0, strlen(tmp_message));
-    fgets(tmp_message, 2000, stdin);
-    if (tmp_message[0] == '/') {
-      if (strcmp(tmp_message, "/exit\n") == 0) {
-        printf("bye\n");
-        return 0;
-      }
+    fgets(tmp_message, 280, stdin);
+    if (strcmp(tmp_message, "/exit\n") == 0) {
+      send(sock, "/exit", strlen("/exit"), 0);
+      printf("bye\n");
+      break;
     }
     else if (tmp_message[0] != '\n') {
       strcat(message, tmp_message);

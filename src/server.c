@@ -1,6 +1,6 @@
 #include "main.h"
 #define PORT 8080
-#define MAX_USERS 10
+#define MAX_USERS 50
 
 int server_fd, new_socket;
 struct sockaddr_in address;
@@ -15,6 +15,17 @@ struct user {
 struct user users[MAX_USERS], tmp_user;
 int users_no = 0;
 
+_Bool starts_with(const char *restrict string, const char *restrict prefix)
+{
+  while(*prefix)
+    {
+      if(*prefix++ != *string++)
+        return 0;
+    }
+
+  return 1;
+}
+
 void *server_chat(void *arg) {
   int user_no = (int)arg;
   char message[2050];
@@ -22,14 +33,61 @@ void *server_chat(void *arg) {
     memset(message, 0, strlen(message));
     read(users[user_no].sockfd, message, 2050);
     if (strcmp(message, "") == 0) {
-      printf("%s left\n", users[user_no].author);
+      char reply[2100];
+      snprintf(reply, strlen(reply), "%s crashed\n", users[user_no].author);
+      printf("%s", reply);
+      for (int i = 0; i < users_no; i++) {
+        send(users[i].sockfd, reply, strlen(reply), 0);
+      }
       break;
     }
-    char reply[2100];
-    snprintf(reply, sizeof(reply), "%c[1;33m%s:%c[0;00m %s", 27, users[user_no].author, 27, message);
-    printf("%s", reply);
-    for (int i = 0; i < users_no; i++) {
-      send(users[i].sockfd, reply, strlen(reply), 0);
+    else if (starts_with(message, "/exit")) {
+      char reply[2100];
+      snprintf(reply, strlen(reply), "%s left\n", users[user_no].author);
+      printf("%s", reply);
+      for (int i = 0; i < users_no; i++) {
+        send(users[i].sockfd, reply, strlen(reply), 0);
+      }
+      break;
+    }
+    else if (starts_with(message, "/w")) {
+      char receiver[2100];
+      char cut_message[2100];
+      char reply[2100];
+      strcpy(receiver, message + 3);
+      for (long unsigned int i = 0; i < strlen(receiver); i++) {
+        if (receiver[i] == ' ') {
+          memset(receiver, 0, strlen(receiver));
+          strncpy(receiver, message + 3, i);
+          receiver[i] = '\0';
+          strcpy(cut_message, message + i + 4);
+          break;
+        }
+      }
+      for (int i = 0; i < users_no; i++) {
+        if ((strcmp(users[i].author, receiver)) == 0) {
+          strcpy(reply, "to ");
+          strcat(reply, users[i].author);
+          strcat(reply, ", from ");
+          strcat(reply, users[user_no].author);
+          strcat(reply, ": ");
+          strcat(reply, cut_message);
+          printf("%s", reply);
+          send(users[user_no].sockfd, reply, strlen(reply), 0);
+          send(users[i].sockfd, reply, strlen(reply), 0);
+        }
+      }
+    }
+    else if (starts_with(message, "/lsu")) {
+      
+    }
+    else {
+      char reply[2100];
+      snprintf(reply, sizeof(reply), "%c[1;33m%s:%c[0;00m %s", 27, users[user_no].author, 27, message);
+      printf("%s", reply);
+      for (int i = 0; i < users_no; i++) {
+        send(users[i].sockfd, reply, strlen(reply), 0);
+      }
     }
   }
   pthread_exit(NULL);
