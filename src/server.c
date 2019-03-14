@@ -53,7 +53,7 @@ void *server_chat(void *arg) {
     else if (starts_with(message, "/w")) {
       char receiver[2100];
       char cut_message[2100];
-      char reply[2100];
+      char reply[2200];
       strcpy(receiver, message + 3);
       for (long unsigned int i = 0; i < strlen(receiver); i++) {
         if (receiver[i] == ' ') {
@@ -66,12 +66,8 @@ void *server_chat(void *arg) {
       }
       for (int i = 0; i < users_no; i++) {
         if ((strcmp(users[i].author, receiver)) == 0) {
-          strcpy(reply, "to ");
-          strcat(reply, users[i].author);
-          strcat(reply, ", from ");
-          strcat(reply, users[user_no].author);
-          strcat(reply, ": ");
-          strcat(reply, cut_message);
+          memset(reply, 0, strlen(reply));
+          snprintf(reply, sizeof(reply), "from %c[1;34m%s%c[0;00m to %c[1;34m%s%c[0;00m: %s", 27, users[user_no].author, 27, 27, users[i].author, 27, cut_message);
           printf("%s", reply);
           send(users[user_no].sockfd, reply, strlen(reply), 0);
           send(users[i].sockfd, reply, strlen(reply), 0);
@@ -80,6 +76,7 @@ void *server_chat(void *arg) {
     }
     else if (starts_with(message, "/lu")) {
       char reply[2100];
+      memset(reply, 0, strlen(reply));
       strcpy(reply, users[0].author);
       for (int i = 1; i < users_no; i++) {
         strcat(reply, " ");
@@ -87,6 +84,14 @@ void *server_chat(void *arg) {
       }
       strcat(reply, "\n");
       printf("%s\n", reply);
+      send(users[user_no].sockfd, reply, strlen(reply), 0);
+    }
+    else if (starts_with(message, "/me")) {
+      char reply[2100];
+      strcpy(message, message + 4);
+      memset(reply, 0, strlen(reply));
+      snprintf(reply, sizeof(reply), "%c[1;33m%s %s%c[0;00m", 27, users[user_no].author, message, 27);
+      printf(reply);
       send(users[user_no].sockfd, reply, strlen(reply), 0);
     }
     else {
