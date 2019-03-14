@@ -78,8 +78,16 @@ void *server_chat(void *arg) {
         }
       }
     }
-    else if (starts_with(message, "/lsu")) {
-      
+    else if (starts_with(message, "/lu")) {
+      char reply[2100];
+      strcpy(reply, users[0].author);
+      for (int i = 1; i < users_no; i++) {
+        strcat(reply, " ");
+        strcat(reply, users[i].author);
+      }
+      strcat(reply, "\n");
+      printf("%s\n", reply);
+      send(users[user_no].sockfd, reply, strlen(reply), 0);
     }
     else {
       char reply[2100];
