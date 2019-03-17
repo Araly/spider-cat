@@ -47,7 +47,10 @@ int client_chat(int sock, char *username) {
   send(sock, message, strlen(message), 0);
   memset(message, 0, strlen(message));
   read(sock, message, 2050);
-  if (strcmp(message, username) != 0) {
+  char possible_wacky_reply_when_server_is_too_fast_for_client[2050];
+  snprintf(possible_wacky_reply_when_server_is_too_fast_for_client, sizeof(possible_wacky_reply_when_server_is_too_fast_for_client),
+           "%s%s joined the server\n", username, username);
+  if (!(strcmp(message, username) == 0 || strcmp(message, possible_wacky_reply_when_server_is_too_fast_for_client) == 0)) {
     printf("[registration failed: %s]\n", message);
     exit(EXIT_FAILURE);
   }

@@ -22,7 +22,6 @@ _Bool starts_with(const char *restrict string, const char *restrict prefix)
       if(*prefix++ != *string++)
         return 0;
     }
-
   return 1;
 }
 
@@ -125,7 +124,7 @@ int server() {
 	}
 
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,
-												&opt, sizeof(opt))) {
+                 &opt, sizeof(opt))) {
 		perror("setsockopt");
 		exit(EXIT_FAILURE);
 	}
@@ -135,7 +134,7 @@ int server() {
 
 	// Forcefully attaching socket to the port 8080
 	if (bind(server_fd, (struct sockaddr *)&address,
-								sizeof(address))<0) {
+           sizeof(address))<0) {
 		perror("bind failed");
 		exit(EXIT_FAILURE);
 	}
@@ -149,7 +148,7 @@ int server() {
     users[users_no].client_addrlen = sizeof(users[users_no].client_addr);
     int s;
     if ((s = accept(server_fd, (struct sockaddr *)&address,
-                             (socklen_t*)&addrlen)) < 0) {
+                    (socklen_t*)&addrlen)) < 0) {
       perror("accept");
       exit(EXIT_FAILURE);
     }
