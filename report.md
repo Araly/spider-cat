@@ -42,6 +42,8 @@ This thread serves to listen to anything that a user could send our way, and pro
 
 Each time we recieve text, we send it to all the users, formated with the user's author name, including to the author, so he knows his message was received and relayed properly.
 
+![diagram](diagram.png)
+
 # Client
 
 ## Communication with the server
@@ -51,6 +53,12 @@ If the reply arrives, it means that the client has been added as a user in the s
 
 We then start a **thread**, to listen for anything the server might send.
 In parallel, we read the user input, and send it to the server when we read a newline `'\n'`.
+
+## Features
+
+- Possibility to connect clients to the server (UDP)
+- Possibility to use commands (exemple : /exit)
+- Possibility to send and receive messages (length of max 280 characters)
 
 # Commands
 
