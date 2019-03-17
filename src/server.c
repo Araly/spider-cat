@@ -92,7 +92,9 @@ void *server_chat(void *arg) {
       memset(reply, 0, strlen(reply));
       snprintf(reply, sizeof(reply), "%c[1;33m%s %s%c[0;00m", 27, users[user_no].author, message, 27);
       printf(reply);
-      send(users[user_no].sockfd, reply, strlen(reply), 0);
+      for (int i = 0; i < users_no; i++) {
+        send(users[i].sockfd, reply, strlen(reply), 0);
+      }
     }
     else {
       char reply[2100];
@@ -109,14 +111,13 @@ void *server_chat(void *arg) {
 int server() {
   pthread_t threads[MAX_USERS];
 
-  pthread_create(&threads[0], NULL, server_chat, NULL);
+  //pthread_create(&threads[0], NULL, server_chat, NULL);
   // Creating socket file descriptor
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
 		perror("socket failed");
 		exit(EXIT_FAILURE);
 	}
 
-	// Forcefully attaching socket to the port 8080
 	if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,
 												&opt, sizeof(opt))) {
 		perror("setsockopt");
