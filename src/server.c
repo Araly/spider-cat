@@ -29,6 +29,12 @@ _Bool starts_with(const char *restrict string, const char *restrict prefix)
 void *server_chat(void *arg) {
   int user_no = (int)arg;
   char message[2050];
+  char reply [2100];
+  snprintf(reply, sizeof(reply), "%s joined the server\n", users[user_no].author);
+  printf("%s", reply);
+  for (int i = 0; i < users_no; i++) {
+    send(users[i].sockfd, reply, strlen(reply), 0);
+  }
   for (;;) {
     memset(message, 0, strlen(message));
     read(users[user_no].sockfd, message, 2050);
@@ -163,13 +169,7 @@ int server() {
       perror("pthread_create");
       exit(EXIT_FAILURE);
     }
-    char reply [2100];
-    snprintf(reply, sizeof(reply), "%s joined the server\n", users[users_no].author);
-    printf("%s", reply);
     users_no++;
-    for (int i = 0; i < users_no; i++) {
-      send(users[i].sockfd, reply, strlen(reply), 0);
-    }
   }
   pthread_exit(NULL);
 }
