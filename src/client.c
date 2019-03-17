@@ -48,7 +48,7 @@ int client_chat(int sock, char *username) {
   memset(message, 0, strlen(message));
   read(sock, message, 2050);
   if (strcmp(message, username) != 0) {
-    printf("registration failed: %s\n", message);
+    printf("[registration failed: %s]\n", message);
     exit(EXIT_FAILURE);
   }
   pthread_t thread;
