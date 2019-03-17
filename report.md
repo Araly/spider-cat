@@ -59,6 +59,7 @@ In parallel, we read the user input, and send it to the server when we read a ne
 - Possibility to connect clients to the server (UDP)
 - Possibility to use commands (exemple : /exit)
 - Possibility to send and receive messages (length of max 280 characters)
+- Possibility to handle up to 50 clients
 
 # Commands
 
