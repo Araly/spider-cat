@@ -4,7 +4,7 @@ title:
 author:
 - Nathan IMMACOLATO
 - Louis GAILLET
-- Ashan
+- Ahsan GULL
 ---
 
 # The program
